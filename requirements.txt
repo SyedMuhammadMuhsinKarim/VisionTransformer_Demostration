@@ -1,0 +1,28 @@
+import torch
+import torch.nn as nn
+from torchvision import models
+from transformers import ViTModel
+
+class ViTBackbone(nn.Module):
+    def __init__(self):
+        super(ViTBackbone, self).__init__()
+        self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k")
+    
+    def forward(self, x):
+        outputs = self.vit(pixel_values=x)
+        return outputs.last_hidden_state
+
+class YOLOViTModel(nn.Module):
+    def __init__(self, yolo_backbone, vit_backbone):
+        super(YOLOViTModel, self).__init__()
+        self.yolo_backbone = yolo_backbone
+        self.vit_backbone = vit_backbone
+        
+        self.fc = nn.Linear(in_features=1024, out_features=6)  # Example for 6 classes (building, A-F)
+    
+    def forward(self, x):
+        yolo_features = self.yolo_backbone(x)
+        vit_features = self.vit_backbone(x)
+        combined_features = torch.cat((yolo_features, vit_features), dim=1)
+        out = self.fc(combined_features)
+        return out
