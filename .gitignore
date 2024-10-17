@@ -1,0 +1,10 @@
+data/images/*
+data/labels/*
+logs/*
+checkpoints/*
+results/*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

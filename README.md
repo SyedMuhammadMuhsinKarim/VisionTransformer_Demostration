@@ -105,6 +105,3 @@ After training, the model's performance will be evaluated using metrics such as 
 
 - [PyTorch](https://pytorch.org/) - Deep learning framework used for model training.
 - [Vision Transformers](https://arxiv.org/abs/2010.11929) - The architecture leveraged for object detection.
-```
-
-Let me know if you need any changes or additional information!
