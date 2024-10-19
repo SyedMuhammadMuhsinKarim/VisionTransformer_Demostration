@@ -3,7 +3,7 @@ import torch
 import cv2
 import numpy as np
 from torch.utils.data import Dataset
-import torchvision.transforms as T
+# import torchvision.transforms as T
 
 def load_yolo_labels(file_path, img_w, img_h):
     """ Load YOLO labels from a file

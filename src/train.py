@@ -1,8 +1,5 @@
-from sympy import im
 import torch
 import torch.optim as optim
-from torch.utils.data import DataLoader
-from src.dataset import YOLODataset
 from src.model import ViTObjectDetection
 from src.utils import calculate_loss, calculate_metrics
 

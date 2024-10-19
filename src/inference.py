@@ -1,6 +1,5 @@
 import torch
 from model import ViTObjectDetection
-from dataset import YOLODataset
 from PIL import Image
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
