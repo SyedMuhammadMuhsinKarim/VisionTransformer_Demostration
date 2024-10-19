@@ -10,3 +10,4 @@ yolov5 # For loading YOLO weights, and other YOLO-related functionalities
 # albumentations # For data augmentations 
 streamlit # Optional, for UI if Streamlit is used for inference 
 seaborn # Optional, for visualizations
+PyQt5==5.15.10 # Optional, for GUI if PyQt5 is used for inference

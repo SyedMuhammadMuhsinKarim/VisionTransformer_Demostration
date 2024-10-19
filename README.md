@@ -17,6 +17,7 @@ This project implements an object detection system using the Vision Transformer 
   - [Running Inference](#running-inference)
   - [Results](#results)
   - [Acknowledgements](#acknowledgements)
+  - [License](#license)
 
 ## Project Overview
 
