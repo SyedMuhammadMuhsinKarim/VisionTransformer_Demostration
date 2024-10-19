@@ -17,28 +17,34 @@ def load_yolo_labels(file_path, img_w, img_h):
         np.array: Bounding box labels
     """
     labels = []
-    with open(file_path, 'r') as f:
-        for line in f.readlines():
-            label = [float(x) for x in line.strip().split()]
-            
-            if len(label) == 5: 
-                class_id, x_center, y_center, width, height = label
+    try:
+        with open(file_path, 'r') as f:
+            for line in f.readlines():
+                label = [float(x) for x in line.strip().split()]
                 
-                x_center *= img_w
-                y_center *= img_h
-                width *= img_w
-                height *= img_h
-                
-                x1 = x_center - width / 2
-                y1 = y_center - height / 2
-                x2 = x_center + width / 2
-                y2 = y_center + height / 2
-                
-                labels.append([class_id, x1, y1, x2, y2])
-            else:
-                print(f"Invalid label: {label}")
+                if len(label) == 5: 
+                    class_id, x_center, y_center, width, height = label
+                    
+                    x_center *= img_w
+                    y_center *= img_h
+                    width *= img_w
+                    height *= img_h
+                    
+                    x1 = x_center - width / 2
+                    y1 = y_center - height / 2
+                    x2 = x_center + width / 2
+                    y2 = y_center + height / 2
+                    
+                    labels.append([class_id, x1, y1, x2, y2])
+                else:
+                    print(f"Invalid label: {label}")
+        return np.array(labels) if len(labels) > 0 else np.zeros((0, 5))  # Ensure labels have shape (N, 5)
+    except FileNotFoundError:
+        print(f"Label file not found: {file_path}")
+    except Exception as e:
+        print(f"An error occurred while reading the label file: {file_path}, {e}")
+        return np.zeros((0, 5))
     
-    return np.array(labels) if len(labels) > 0 else np.zeros((0, 5))  # Ensure labels have shape (N, 5)
 
 class YOLODataset(Dataset):
     def __init__(self, image_dir, label_dir, transforms=None, target_size=(512, 512)):
@@ -163,38 +169,3 @@ class YOLODataset(Dataset):
                 return i
         
         raise ValueError(f"Image {filename} not found in the dataset")            
-
-def custom_collate_fn(batch):
-    images = []
-    targets = []
-
-    for sample in batch:
-        if sample is not None:  # In case some images have no labels
-            img, target = sample
-            images.append(img)
-            targets.append(target)  # Append the target as it is (do not convert to tensor here)
-    
-    images = torch.stack(images)
-    
-    return images, targets
-
-
-if __name__ == "__main__":
-    n = 1
-    width = 512
-    height = 512
-    target_size = (width*n, height*n)
-    dataset = YOLODataset("data/images/train", "data/labels/train", target_size=target_size)
-    from torch.utils.data import DataLoader
-
-    BATCH_SIZE = 16
-    # collate_fn = lambda x: list(filter(lambda y: y is not None, x))
-
-    train_loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=custom_collate_fn)
-    
-    for images, targets in train_loader:
-        print(type(images), type(targets))
-        print(len(images), len(targets))
-        print(f"Images shape: {images.shape}, Targets shape: {len(targets)}")
-        print(f"Targets: {targets}")
-        break

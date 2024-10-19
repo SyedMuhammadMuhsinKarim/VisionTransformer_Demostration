@@ -2,9 +2,9 @@ from sympy import im
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from dataset import YOLODataset
-from model import ViTObjectDetection
-from utils import calculate_loss, calculate_metrics
+from src.dataset import YOLODataset
+from src.model import ViTObjectDetection
+from src.utils import calculate_loss, calculate_metrics
 
 # Configuration settings
 BATCH_SIZE = 16
@@ -17,8 +17,23 @@ def validate_model(model, val_loader):
     with torch.no_grad():
         for images, targets in val_loader:
             images = images.to(DEVICE)
-            labels = targets["labels"].to(DEVICE)
-            boxes = targets["boxes"].to(DEVICE)
+            batch_labels = []
+            batch_boxes = []
+
+            for target in targets:
+                if target is not None:
+                    batch_labels.append(target[:, 0])  # assuming the first column is the class label
+                    batch_boxes.append(target[:, 1:])   # the remaining columns are bounding boxes
+
+            max_length = max(len(lbl) for lbl in batch_labels) if batch_labels else 0
+            num_images = len(batch_labels)
+
+            labels = torch.zeros((num_images, max_length), dtype=torch.long).to(DEVICE)
+            boxes = torch.zeros((num_images, max_length, 4), dtype=torch.float).to(DEVICE)
+
+            for idx, (lbl, bxs) in enumerate(zip(batch_labels, batch_boxes)):
+                labels[idx, :len(lbl)] = lbl
+                boxes[idx, :len(bxs)] = bxs
 
             # Forward pass
             class_logits, bbox_coords = model(images)
@@ -66,8 +81,7 @@ def train_model(train_loader, val_loader, num_classes):
             optimizer.zero_grad()
             class_logits, bbox_coords = model(images)
 
-            # Prepare labels for classification loss
-            cls_labels = labels[:, 0]  # or you can apply a logic to select the main label
+            cls_labels = labels[:, 0]
 
             loss = calculate_loss(class_logits, bbox_coords, cls_labels, boxes)
             loss.backward()
@@ -79,6 +93,7 @@ def train_model(train_loader, val_loader, num_classes):
         print(f"Epoch [{epoch + 1}/{NUM_EPOCHS}], Loss: {running_loss / len(train_loader)}")
 
         validate_model(model, val_loader)
+        
 
     torch.save(model.state_dict(), "checkpoints/best_model.pth")
 
@@ -96,12 +111,12 @@ def custom_collate_fn(batch):
     
     return images, targets
 
-if __name__ == "__main__":
-    train_dataset = YOLODataset("data/images/train", "data/labels/train", target_size=(224, 224))
-    val_dataset = YOLODataset("data/images/val", "data/labels/val", target_size=(224, 224))
+# if __name__ == "__main__":
+#     train_dataset = YOLODataset("data/images/train", "data/labels/train", target_size=(224, 224))
+#     val_dataset = YOLODataset("data/images/val", "data/labels/val", target_size=(224, 224))
 
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=custom_collate_fn)
-    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=custom_collate_fn)
+#     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=custom_collate_fn)
+#     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=custom_collate_fn)
 
-    train_model(train_loader, val_loader, num_classes=8)
+#     train_model(train_loader, val_loader, num_classes=8)
 

@@ -39,13 +39,27 @@ def calculate_loss(class_logits, bbox_coords, labels, boxes):
     classification_loss = nn.CrossEntropyLoss()
     regression_loss = nn.MSELoss()
     
+    # print(f"Class logits shape: {class_logits.shape}")
+    # print(f"Labels shape: {labels.shape}")
+    
+    # print(f"Class logits: {class_logits}")
+    # print(f"Labels: {labels}")
     if labels.ndim > 1:
-        labels = labels[:, 0]  # Adjust according to your label handling logic
+        labels = labels[:, 0]
+        
+    # predicted_classes = torch.argmax(class_logits, dim=1)
+    # print(f"Predicted classes: {predicted_classes}")        
+
+    # if labels.shape != predicted_classes.shape:
+    #     raise ValueError(f"Labels and class logits must have the same shape: "
+    #                      f"got {labels.shape} and {class_logits.shape}")
 
     labels = labels.to(class_logits.device)
+    # print(f"Labels: {labels}")
 
     cls_loss = classification_loss(class_logits, labels)
-
+    print(f"Class Loss: {cls_loss}")
+    
     boxes_selected = boxes[:, 0, :]  # Get the first box for each sample
 
     if bbox_coords.shape != boxes_selected.shape:
@@ -62,9 +76,9 @@ def calculate_loss(class_logits, bbox_coords, labels, boxes):
 def calculate_metrics(class_logits, bbox_coords, labels, boxes):
     """ Calculate the metrics for the model """
     
-    predicted_classes = torch.argmax(class_logits, dim=1)
-    accuracy = (predicted_classes == labels).float().mean().item()
-    print(f"Validation Accuracy: {accuracy * 100:.2f}%")
+    total_loss = calculate_loss(class_logits, bbox_coords, labels, boxes)
+    print(f"Total Loss: {total_loss}")
+    
 
 class ShowImage:
     def __init__(self, figsize=(10, 10)):
