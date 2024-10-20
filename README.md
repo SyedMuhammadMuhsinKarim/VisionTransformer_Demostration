@@ -44,6 +44,7 @@ project_root/
 │   ├── inference.py        # Inference logic for testing new images
 │   └── utils.py            # Helper functions (loss, metrics)
 │
+├── main.py         
 ├── checkpoints/            # Saved model weights
 └── README.md               # Project documentation
 ```
@@ -77,13 +78,11 @@ pip install -r requirements.txt
 
 ## Training the Model
 
-To train the model, navigate to the `src/` directory and run:
+To train the model, navigate to the main directory and run:
 
 ```bash
 python main.py
 ```
-
-You can adjust hyperparameters in `train.py` as needed.
 
 ## Acknowledgements
 
