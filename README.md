@@ -14,9 +14,6 @@ This project implements an object detection system using the Vision Transformer 
     - [Install Dependencies](#install-dependencies)
   - [Dataset Preparation](#dataset-preparation)
   - [Training the Model](#training-the-model)
-  - [Running Inference](#running-inference)
-  - [Results](#results)
-  - [Acknowledgements](#acknowledgements)
   - [License](#license)
 
 ## Project Overview
@@ -62,8 +59,8 @@ Ensure that you have `Python 3.8+` installed, along with `pip`.
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/vit-object-detection.git
-cd vit-object-detection
+git clone https://github.com/SyedMuhammadMuhsinKarim/VisionTransformer_Demostration
+cd VisionTransformer_Demostration
 ```
 
 ### Install Dependencies
@@ -83,24 +80,10 @@ pip install -r requirements.txt
 To train the model, navigate to the `src/` directory and run:
 
 ```bash
-python train.py
+python main.py
 ```
 
 You can adjust hyperparameters in `train.py` as needed.
-
-## Running Inference
-
-To run inference on a new image, use the following command:
-
-```bash
-python inference.py --image_path path/to/your/image.jpg
-```
-
-The detected objects will be displayed with bounding boxes and labels.
-
-## Results
-
-After training, the model's performance will be evaluated using metrics such as mAP (mean Average Precision). The results will be logged in the training process.
 
 ## Acknowledgements
 
